@@ -697,6 +697,8 @@ def ajax_pirna_binding_site(request):
     piRNA = piRNA.drop_duplicates()
     piRNA = piRNA.tolist()
 
+    print("views.py done")
+
     return JsonResponse({
         'pirna_table': df_pirna_table.to_json(orient='index', force_ascii=False),
         'piRNA': piRNA,

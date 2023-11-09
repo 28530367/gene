@@ -11,18 +11,21 @@ $(document).ready(function(){
 
             var str_pirna_table = JSON.parse(response.pirna_table);
             var pirna_table = [];
+            var piRNAs = response.piRNA 
             $.each(str_pirna_table, function(key, value) {
                 pirna_table.push(value);
             });
 
             console.log(pirna_table)
             pirna_table = $('#pirna_table').DataTable({
-                "lengthChange": true, // 關閉 "Show X entries"
-                "searching": true, // 關閉搜索功能
+                "lengthChange": true, // "Show X entries"
+                "searching": true, // 搜索功能
                 "scrollX": true,  // 啟用水平滾動
                 "scrollY": '70vh',  // 設置垂直滾動高度，可以更改為您需要的值
+                "paging": true,
                 "scrollCollapse": true,  // 如果內容不足，則隱藏滾動條
-                "paging": false,  // 禁用分頁（如果不需要的話）
+                "paging": true,  // 禁用分頁（如果不需要的話）
+                "pageLength": 9,
                 "data": pirna_table,
                 "columns": [
                     { data: 'id', title: "CLASH READ ID" },
@@ -52,22 +55,34 @@ $(document).ready(function(){
                     }
                 ],
             });
-            var form = $("#check_form"); // 取得表單元素
+            var table = $('#piRNATable').DataTable({
+                "paging": true,
+                "ordering": false,
+                "scrollX": false,  // 啟用水平滾動
+                "info": false,
+                "scrollCollapse": true,  // 如果內容不足，則隱藏滾動條
+                "pageLength": 6,
+            });
 
-                $.each(response.piRNA, function (index, labelText) {
-                    var label = $("<label></label>"); // 建立 <label> 元素
-                    label.text(labelText); // 設定 <label> 元素的文字內容
+            piRNAs.forEach(function(piRNA) {
+                table.row.add([`<input type="checkbox" class="piRNA-checkbox" value="${piRNA}">`, piRNA]);
+            });
+        
+            table.draw();
+        
+            // Add event listener for "Select All" checkbox
+            $('#selectAll').on('change', function() {
+                // Check/uncheck checkboxes on the current page
+                $('.piRNA-checkbox').prop('checked', this.checked);
+            
+                // Check/uncheck checkboxes on other pages
+                if (this.checked) {
+                    table.rows().nodes().to$().find('.piRNA-checkbox').prop('checked', true);
+                } else {
+                    table.rows().nodes().to$().find('.piRNA-checkbox').prop('checked', false);
+                }
+            });
 
-                    var input = $("<input type='checkbox' />"); // 建立 <input> 元素，設定類型為文字
-                    input.attr('id', labelText); // 設定 id，你可以自訂 id 名稱
-                    input.attr('name', labelText); // 設定 name，這裡使用相同的 name
-                    input.attr('value', labelText); // 設定 value，這裡將其設定為 labelText 的值
-                    
-                    // 將 <label> 和 <input> 加入表單
-                    form.append(input);
-                    form.append(label);
-                    form.append("<br>");
-                });
 
         },
         error: function(){
