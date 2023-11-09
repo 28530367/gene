@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} RNA Binding Site {% endblock %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/pirna_binding_site.css' %}">
+{% endblock %}
+{% block content %}
+<div class="card mb-4 border-dark" style="border-top-left-radius: 0rem!important;">
+    <div class="card-body text-dark text-center">
+        <div class="card my-4">
+            <div class="card mt-3">
+                <div class="card-header fs-5 fw-bold">
+                    piRNA target sites
+                </div>
+                <div class="card-header fs-5 fw-bold">
+                    <form id="check_form">
+                    </form>
+                </div>
+                <div>
+                    <table id="pirna_table" class="table table-hover" style="width:100%"></table>
+                </div>
+                <div class="card-header fs-5 fw-bold">
+                    Interactions Detail
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/pirna_binding_site.js' %}"></script>
+{% endblock %}
