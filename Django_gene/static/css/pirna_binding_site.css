@@ -19,6 +19,10 @@ mark {
     background-color: lightgreen;
 }
 
+#r {
+    color: red;
+}
+
 td {
     display: table-cell;
     vertical-align: inherit;
@@ -26,8 +30,7 @@ td {
 }
 
 .sequence {
-    text-align: center;
-    font-family: Lucida Console;
+    font-family: monospace Console;
     font-size: 12pt;
 }
 

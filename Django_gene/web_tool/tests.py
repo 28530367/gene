@@ -1,15 +1,9 @@
 import pandas as pd
 
-# 创建示例DataFrame
-data = {'column_name': ['Hello', 'World', 'Python', 'Pandas']}
+data = {'column_name': ['Hellooooo564564564oooooo', 'Hellooooo564564564oooooo', 'Hellooooo564564564oooooo', 'Hellooooo564564564oooooo']}
 df = pd.DataFrame(data)
 
-# 自定义函数用于颠倒字符串
-def reverse_string(s):
-    return s[::-1]
+# Insert '|' at positions 14 and 21 in the 'column_name' column
+df['column_name'] = df['column_name'].str.slice_replace(14, 14, '|').str.slice_replace(21, 21, '|')
 
-# 在列上应用自定义函数
-df['column_name'] = df['column_name'].apply(reverse_string)
-
-# 显示结果
 print(df)

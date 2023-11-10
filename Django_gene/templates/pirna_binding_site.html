@@ -14,55 +14,6 @@
                 </div>
                 <div id="clash_filter" class="accordion-collapse collapse show container" data-bs-parent="#accordionExample">
                     <div class="accordion-body row">
-                        <div class="col-md-3">
-                            <h2><strong>Hybrid Read Filter:</strong></h2>
-                            <div class="mx-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" name="rc_filter" type="checkbox" value="true" id="filter_rc">
-                                    <label class="form-check-label" for="filter_rc">
-                                        Read Count &gt;= 
-                                        <input id="rc_val" type="number" class="form-control" name="rc_val" value="0" aria-label="Text input with checkbox">
-                                    </label> 
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" name="score_filter" type="checkbox" value="true" id="filter_score">
-                                    <label class="form-check-label" for="filter_score" id="score_filter">
-                                        PirScan Score &gt;= 
-                                        <input id="score_val" type="number" class="form-control" name="score_val" value="0" aria-label="Text input with checkbox">
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" name="score_filter_rnaup" type="checkbox" value="true" id="filter_score_rnaup">
-                                    <label class="form-check-label" for="filter_score" id="score_filter_rnaup">
-                                        RNAup binding energy &lt;=
-                                        <input id="score_val_rnaup" type="number" class="form-control" name="score_val" value="0" aria-label="Text input with checkbox">
-                                    </label>
-                                </div>
-                                <!-- <div class="form-check">
-                                    <input class="form-check-input" name="mut_filter" type="checkbox" value="true" id="filter_mut">
-                                    <label class="form-check-label" for="filter_mut">
-                                        With Mutation
-                                    </label>
-                                </div> -->
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <h2><strong>Binding Site Extension Method:</strong></h2>
-                            <div id="extension_selection" class="mx-3">
-                                <div class="form-check">
-                                    <input class="form-check-input bind" type="checkbox" value="min_ex" id="min_ex" name="extension" checked="">
-                                    <label class="form-check-label" for="min_ex">
-                                        Minimum Extension
-                                    </label>
-                                </div>
-                                <!-- <div class="form-check">
-                                    <input class="form-check-input bind" type="checkbox" value="max_ex" id="max_ex" name="extension">
-                                    <label class="form-check-label" for="max_ex">
-                                        Maximum Extension
-                                    </label>
-                                </div> -->
-                            </div>
-                        </div>
                         <div class="col-md-5" id="pirna_filter_div">
                             <h2><strong>piRNA Filter:</strong></h2>
                             <div id="pirna_filter" class="mx-3">

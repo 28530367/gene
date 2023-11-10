@@ -663,6 +663,9 @@ def ajax_pirna_binding_site(request):
                 elif char2 == '-':
                     new_target_sequence += "<span class='dash'>" + char2 + "</span>"
                     new_regulator_sequence += "<mark id='g'>" + char1 + "</mark>"
+                elif char1 == '|':
+                    new_target_sequence += "<span id='r'> " + char2 + " </span>"
+                    new_regulator_sequence += "<span id='r'> " + char1 + " </span>"
                 else:
                     new_target_sequence += "<mark id='y'>" + char2 + "</mark>"
                     new_regulator_sequence += char1
@@ -670,13 +673,13 @@ def ajax_pirna_binding_site(request):
             df.at[index, column1] = new_regulator_sequence
             df.at[index, column2] = new_target_sequence
             
-        df[column1][df[column1] != '-'] = "5' " + df[column1][df[column1] != '-'] + " 3'"
-        df[column2][df[column2] != '-'] = "3' " + df[column2][df[column2] != '-'] + " 5'"
+        df[column1][df[column1] != '-'] = "5'  " + df[column1][df[column1] != '-'] + "  3'"
+        df[column2][df[column2] != '-'] = "3'  " + df[column2][df[column2] != '-'] + "  5'"
 
         df[column1] = df.apply(lambda row: f"{row[column1]}<br>{row[column2]}", axis=1)
 
         return df
-    
+
     pirna_hyb_csv_path =  f"{media_path}/wtCLASH_hyb_final_web.csv"
     df_pirna_hyb = pd.read_csv(pirna_hyb_csv_path)
 
@@ -690,6 +693,13 @@ def ajax_pirna_binding_site(request):
     df_pirna_table['pirscan min_ex Target sequence'] = df_pirna_table['pirscan min_ex Target sequence'].apply(reverse_string)
     df_pirna_table['Regulator RNA Sequence'] = df_pirna_table['Regulator RNA Sequence'].apply(reverse_string)
     
+    # Insert '|' at positions 14 and 21 in the 'column_name' column
+    df_pirna_table['pirscan min_ex Target sequence'] = df_pirna_table['pirscan min_ex Target sequence'].str.slice_replace(14, 14, '|').str.slice_replace(21, 21, '|')
+    df_pirna_table['RNAup min_ex Target RNA sequence'] = df_pirna_table['RNAup min_ex Target RNA sequence'].str.slice_replace(14, 14, '|').str.slice_replace(21, 21, '|')
+    df_pirna_table['Regulator RNA Sequence'] = df_pirna_table['Regulator RNA Sequence'].str.slice_replace(14, 14, '|').str.slice_replace(21, 21, '|')
+    df_pirna_table['RNAup min_ex Regulator RNA sequence'] = df_pirna_table['RNAup min_ex Regulator RNA sequence'].str.slice_replace(14, 14, '|').str.slice_replace(21, 21, '|')
+
+
     df_pirna_table = RNAup_regulator_sequence(df_pirna_table, 'pirscan min_ex Target sequence', 'Regulator RNA Sequence')
     df_pirna_table = RNAup_regulator_sequence(df_pirna_table, 'RNAup min_ex Target RNA sequence', 'RNAup min_ex Regulator RNA sequence')
 
@@ -697,10 +707,37 @@ def ajax_pirna_binding_site(request):
     piRNA = piRNA.drop_duplicates()
     piRNA = piRNA.tolist()
 
+    # Convert DataFrame to JSON
+    json_data = df_pirna_table.to_json(orient='records')
+
+    # Specify the file path
+    file_path = f"{media_path}/pirna_binding.json"
+
+    # Write JSON data to a file
+    with open(file_path, 'w') as file:
+        file.write(json_data)
+
     print("views.py done")
 
     return JsonResponse({
         'pirna_table': df_pirna_table.to_json(orient='index', force_ascii=False),
         'piRNA': piRNA,
+    })
+
+def ajax_pirna_binding_site_search(request):
+
+    selectedValues = request.GET.get('selected', '')
+    selectedValues = selectedValues.split(', ')
+
+    # Specify the file path
+    file_path = f"{media_path}/pirna_binding.json"
+
+    df_pirna_table = pd.read_json(file_path)
+
+    if selectedValues:
+        df_pirna_table = df_pirna_table[df_pirna_table['Regulator RNA Name'].isin(selectedValues)]
+
+    return JsonResponse({
+        'pirna_table': df_pirna_table.to_json(orient='index', force_ascii=False),
     })
     
