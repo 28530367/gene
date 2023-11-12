@@ -7,20 +7,35 @@ mark {
     padding: 0em;
 }
 
-#y {
+.y {
     background-color: yellow;
 }
 
-#b {
+.b {
     background-color: lightblue;
 }
 
-#g {
+.g {
     background-color: lightgreen;
 }
 
-#r {
+.r {
     color: red;
+    margin: 0;
+}
+
+.no {
+    background-color: transparent;
+}
+
+.dash,
+.y,
+.b,
+.g,
+.no {
+    display: inline-block; /* 将每个核苷酸设为内联块级元素 */
+    width: 0.7em; /* 设置每个核苷酸宽度 */
+    text-align: center; /* 水平居中 */
 }
 
 td {
@@ -31,8 +46,10 @@ td {
 
 .sequence {
     font-family: monospace Console;
+    justify-content: space-between;
     font-size: 12pt;
 }
+
 
 .tooltip {
     position: absolute;
@@ -66,4 +83,17 @@ td {
     background-color: #007bff;
     color: #fff;
     border: 1px solid #007bff;
+}
+
+#floating-table {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid #ccc;
+    background-color: lightgray;
+    z-index: 1000;
+    white-space: nowrap;
+    text-align: center;
 }

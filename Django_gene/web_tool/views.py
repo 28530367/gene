@@ -10,6 +10,8 @@ import pandas as pd
 import requests
 import json
 import os
+from django_pandas.io import read_frame
+
 
 media_path = settings.MEDIA_DIRS_PATH
 
@@ -171,6 +173,7 @@ def ajax_data_transcript(request):
         df_spliced_features = df_spliced_features.loc[:,['type', 'start', 'stop', 'length']]
         df_spliced_svg_data = df_spliced_features[df_spliced_features['type'].str.startswith(('exon', 'intron'))].loc[:, 'stop']
         spliced_svg_data = df_spliced_svg_data.tolist()
+        print(df_spliced_svg_data)
         df_spliced_features_exon = df_spliced_features[df_spliced_features['type'].str.startswith('exon')].copy().reset_index(drop=True)
         df_spliced_features_UTR = df_spliced_features[(df_spliced_features['type'] == 'five_prime_UTR') | (df_spliced_features['type'] == 'three_prime_UTR')]
         spliced_svg_UTR_data = df_spliced_features_UTR[['start', 'stop']].values.tolist()
@@ -220,6 +223,8 @@ def ajax_data_transcript(request):
 
         spliced_svg_data.insert(0, 0)
         df_spliced_features = df_spliced_features.to_dict(orient="records")
+
+        
 
         #translation
         if coding_transcript == 'Coding_transcript':
@@ -652,63 +657,88 @@ def ajax_pirna_binding_site(request):
             
             for char1, char2 in zip(first_sequence, second_sequence):
                 if (char1 == 'G' and char2 == 'U') or (char1 == 'U' and char2 == 'G'):
-                    new_target_sequence += "<mark id='b'>" + char2 + "</mark>"
-                    new_regulator_sequence += char1
+                    new_target_sequence += "<span class='b'>" + char2 + "</span>"
+                    new_regulator_sequence += "<span class='no'>" + char1 + "</span>"
                 elif (char1 == 'A' and char2 == 'U') or (char1 == 'U' and char2 == 'A') or (char1 == 'C' and char2 == 'G') or (char1 == 'G' and char2 == 'U') or (char1 == '-' and char2 == '-'):
-                    new_target_sequence += char2
-                    new_regulator_sequence += char1
+                    new_target_sequence += "<span class='no'>" + char2 + "</span>"
+                    new_regulator_sequence += "<span class='no'>" + char1 + "</span>"
                 elif char1 == '-':
-                    new_target_sequence += "<mark id='g'>" + char2 + "</mark>"
+                    new_target_sequence += "<span class='g'>" + char2 + "</span>"
                     new_regulator_sequence += "<span class='dash'>" + char1 + "</span>"
                 elif char2 == '-':
                     new_target_sequence += "<span class='dash'>" + char2 + "</span>"
-                    new_regulator_sequence += "<mark id='g'>" + char1 + "</mark>"
+                    new_regulator_sequence += "<span class='g'>" + char1 + "</span>"
                 elif char1 == '|':
-                    new_target_sequence += "<span id='r'> " + char2 + " </span>"
-                    new_regulator_sequence += "<span id='r'> " + char1 + " </span>"
+                    new_target_sequence += "<span class='r'> " + char2 + " </span>"
+                    new_regulator_sequence += "<span class='r'> " + char1 + " </span>"
                 else:
-                    new_target_sequence += "<mark id='y'>" + char2 + "</mark>"
-                    new_regulator_sequence += char1
+                    new_target_sequence += "<span class='y'>" + char2 + "</span>"
+                    new_regulator_sequence += "<span class='no'>" + char1 + "</span>"
 
             df.at[index, column1] = new_regulator_sequence
             df.at[index, column2] = new_target_sequence
             
-        df[column1][df[column1] != '-'] = "5'  " + df[column1][df[column1] != '-'] + "  3'"
-        df[column2][df[column2] != '-'] = "3'  " + df[column2][df[column2] != '-'] + "  5'"
+        df[column1][df[column1] != "<span class='no'>-</span>"] = "5'  " + df[column1] + "  3'"
+        df[column2][df[column2] != "<span class='no'>-</span>"] = "3'  " + df[column2] + "  5'"
 
         df[column1] = df.apply(lambda row: f"{row[column1]}<br>{row[column2]}", axis=1)
 
         return df
 
-    pirna_hyb_csv_path =  f"{media_path}/wtCLASH_hyb_final_web.csv"
-    df_pirna_hyb = pd.read_csv(pirna_hyb_csv_path)
+    transcript_id = request.GET.get('text', '')
 
-    transcript_id = [request.GET.get('text', '')]
+    # get target_rna_tabledata from WtclashHybFinalWeb SQL
+    sql_target_rna_tabledata = models.WtclashHybFinalWeb.objects.filter(target_rna_name=transcript_id)
+    df_pirna_table = read_frame(sql_target_rna_tabledata)
 
-    df_unspliced_features, unspliced_sequence, df_spliced_features, spliced_sequence, translation_sequence = wormbase_crawler(transcript_id[0])
-    gene_sequence_svgdata, gene_sequence_svgcolorindex = utr_cds_ranges(spliced_sequence)
+    # get target_rna_wt_wagoip form WtCrisprWago1FlagIpSrnaSeqBedgraph SQL
+    sql_target_rna_wt_wagoip = models.WtCrisprWago1FlagIpSrnaSeqBedgraph.objects.filter(ref_id=transcript_id)
+    df_wt_wagoip_data = read_frame(sql_target_rna_wt_wagoip)
 
-    df_pirna_table = df_pirna_hyb[df_pirna_hyb['Target RNA Name'].isin(transcript_id)]
+    df_unspliced_features, unspliced_sequence, df_spliced_features, spliced_sequence, translation_sequence = wormbase_crawler(transcript_id)
+    spliced_svgdata, spliced_svg_colorindex = utr_cds_ranges(spliced_sequence)
 
-    df_pirna_table['pirscan min_ex Target sequence'] = df_pirna_table['pirscan min_ex Target sequence'].apply(reverse_string)
-    df_pirna_table['Regulator RNA Sequence'] = df_pirna_table['Regulator RNA Sequence'].apply(reverse_string)
+    df_pirna_table['pirscan_min_ex_target_sequence'] = df_pirna_table['pirscan_min_ex_target_sequence'].apply(reverse_string)
+    df_pirna_table['regulator_rna_sequence'] = df_pirna_table['regulator_rna_sequence'].apply(reverse_string)
     
     # Insert '|' at positions 14 and 21 in the 'column_name' column
-    df_pirna_table['pirscan min_ex Target sequence'] = df_pirna_table['pirscan min_ex Target sequence'].str.slice_replace(14, 14, '|').str.slice_replace(21, 21, '|')
-    df_pirna_table['RNAup min_ex Target RNA sequence'] = df_pirna_table['RNAup min_ex Target RNA sequence'].str.slice_replace(14, 14, '|').str.slice_replace(21, 21, '|')
-    df_pirna_table['Regulator RNA Sequence'] = df_pirna_table['Regulator RNA Sequence'].str.slice_replace(14, 14, '|').str.slice_replace(21, 21, '|')
-    df_pirna_table['RNAup min_ex Regulator RNA sequence'] = df_pirna_table['RNAup min_ex Regulator RNA sequence'].str.slice_replace(14, 14, '|').str.slice_replace(21, 21, '|')
+    df_pirna_table['pirscan_min_ex_target_sequence'][df_pirna_table['pirscan_min_ex_target_sequence'] != '-'] = df_pirna_table['pirscan_min_ex_target_sequence'].str.slice_replace(14, 14, '|').str.slice_replace(21, 21, '|')
+    df_pirna_table['rnaup_min_ex_target_rna_sequence'][df_pirna_table['rnaup_min_ex_target_rna_sequence'] != '-'] = df_pirna_table['rnaup_min_ex_target_rna_sequence'].str.slice_replace(14, 14, '|').str.slice_replace(21, 21, '|')
+    df_pirna_table['regulator_rna_sequence'][df_pirna_table['regulator_rna_sequence'] != '-'] = df_pirna_table['regulator_rna_sequence'].str.slice_replace(14, 14, '|').str.slice_replace(21, 21, '|')
+    df_pirna_table['rnaup_min_ex_regulator_rna_sequence'][df_pirna_table['rnaup_min_ex_regulator_rna_sequence'] != '-'] = df_pirna_table['rnaup_min_ex_regulator_rna_sequence'].str.slice_replace(14, 14, '|').str.slice_replace(21, 21, '|')
 
 
-    df_pirna_table = RNAup_regulator_sequence(df_pirna_table, 'pirscan min_ex Target sequence', 'Regulator RNA Sequence')
-    df_pirna_table = RNAup_regulator_sequence(df_pirna_table, 'RNAup min_ex Target RNA sequence', 'RNAup min_ex Regulator RNA sequence')
+    df_pirna_table = RNAup_regulator_sequence(df_pirna_table, 'pirscan_min_ex_target_sequence', 'regulator_rna_sequence')
+    df_pirna_table = RNAup_regulator_sequence(df_pirna_table, 'rnaup_min_ex_target_rna_sequence', 'rnaup_min_ex_regulator_rna_sequence')
 
-    piRNA = df_pirna_table['Regulator RNA Name']
+    piRNA = df_pirna_table['regulator_rna_name']
     piRNA = piRNA.drop_duplicates()
     piRNA = piRNA.tolist()
 
+    # spliced_exon svg data
+    df_spliced_exon = df_spliced_features[df_spliced_features['type'].str.startswith(('exon'))]
+    spliced_exon_svgdata = df_spliced_exon[['start', 'stop']].values.tolist()
+
+    spliced_exon_svg_colorindex = [0] * len(spliced_exon_svgdata)
+    for i in range(len(spliced_exon_svgdata)):
+        if i % 2 == 0:
+            spliced_exon_svg_colorindex[i] = 1
+        elif i % 2 == 1:
+            spliced_exon_svg_colorindex[i] = 2
+
+    df_pirna_table["target_rna_region_found_in_clash_read"] = df_pirna_table["target_rna_region_found_in_clash_read"].apply(lambda x: [int(val) for val in x.split('-')]) 
+    df_pirna_table_sorted = df_pirna_table.sort_values(by="target_rna_region_found_in_clash_read", key=lambda x: x.str[0])
+
+    pirna_svgdata = df_pirna_table_sorted["target_rna_region_found_in_clash_read"].tolist()
+
+    pirna_svgdata_index = pirna_svgdata_index_fuction(pirna_svgdata)
+
+    df_pirna_table_sorted["target_rna_region_found_in_clash_read"] = df_pirna_table_sorted["target_rna_region_found_in_clash_read"].apply(lambda lst: f"{lst[0]}-{lst[1]}")
+    
+    wt_wagoip_svgdata = df_wt_wagoip_data[['init_pos', 'end_pos', 'evenly_rc']].values.tolist()
+
     # Convert DataFrame to JSON
-    json_data = df_pirna_table.to_json(orient='records')
+    json_data = df_pirna_table_sorted.to_json(orient='records')
 
     # Specify the file path
     file_path = f"{media_path}/pirna_binding.json"
@@ -720,8 +750,15 @@ def ajax_pirna_binding_site(request):
     print("views.py done")
 
     return JsonResponse({
-        'pirna_table': df_pirna_table.to_json(orient='index', force_ascii=False),
+        'pirna_table': df_pirna_table_sorted.to_json(orient='index', force_ascii=False),
         'piRNA': piRNA,
+        'spliced_svgdata': spliced_svgdata,
+        'spliced_svg_colorindex': spliced_svg_colorindex,
+        'spliced_exon_svgdata': spliced_exon_svgdata,
+        'spliced_exon_svg_colorindex': spliced_exon_svg_colorindex,
+        'pirna_svgdata': pirna_svgdata,
+        'pirna_svgdata_index': pirna_svgdata_index,
+        'wt_wagoip_svgdata': wt_wagoip_svgdata,
     })
 
 def ajax_pirna_binding_site_search(request):
@@ -735,9 +772,20 @@ def ajax_pirna_binding_site_search(request):
     df_pirna_table = pd.read_json(file_path)
 
     if selectedValues:
-        df_pirna_table = df_pirna_table[df_pirna_table['Regulator RNA Name'].isin(selectedValues)]
+        df_pirna_table = df_pirna_table[df_pirna_table['regulator_rna_name'].isin(selectedValues)]
 
+    df_pirna_table["target_rna_region_found_in_clash_read"] = df_pirna_table["target_rna_region_found_in_clash_read"].apply(lambda x: [int(val) for val in x.split('-')]) 
+
+    pirna_svgdata = df_pirna_table["target_rna_region_found_in_clash_read"].tolist()
+    pirna_svgdata_index = pirna_svgdata_index_fuction(pirna_svgdata)
+
+    df_pirna_table["target_rna_region_found_in_clash_read"] = df_pirna_table["target_rna_region_found_in_clash_read"].apply(lambda lst: f"{lst[0]}-{lst[1]}")
+    
     return JsonResponse({
         'pirna_table': df_pirna_table.to_json(orient='index', force_ascii=False),
+        'pirna_svgdata': pirna_svgdata,
+        'pirna_svgdata_index': pirna_svgdata_index,
     })
+    
+
     

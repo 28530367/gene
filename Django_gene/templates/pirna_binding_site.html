@@ -6,7 +6,7 @@
 {% endblock %}
 {% block content %}
 <div class="card mb-4 border-dark" style="border-top-left-radius: 0rem!important;">
-    <div class="card-body text-dark text-center">
+    <div class="card-body text-dark">
         <div class="card my-4">
             <div class="card mt-3">
                 <div class="card-header fs-5 fw-bold">
@@ -17,10 +17,10 @@
                         <div class="col-md-5" id="pirna_filter_div">
                             <h2><strong>piRNA Filter:</strong></h2>
                             <div id="pirna_filter" class="mx-3">
-                                <table id="piRNATable" class="cell-border hover dataTable no-footer" aria-describedby="pirna_ftable_info" style="width: 370px;">
+                                <table id="piRNA_Search_Table" class="cell-border hover dataTable no-footer" aria-describedby="pirna_ftable_info" style="width: 370px;">
                                     <thead>
                                         <tr>
-                                            <th><input type="checkbox" id="selectAll"> Select All</th>
+                                            <th><input type="checkbox" id="selectAll" checked="checked"> Select All</th>
                                             <th>piRNA</th>
                                         </tr>
                                     </thead>
@@ -39,6 +39,30 @@
                     <div>
                         <br>
                         <table id="pirna_table" class="table table-hover" style="width:100%"></table>
+                    </div>
+                    <div id="floating-table">
+                        <table border="1" id="dynamic-table">
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <br>
+                <div>
+                    <div class="card-header fs-5 fw-bold">
+                        CLASH_WT identified piRNA target sites
+                    </div>
+                    <div class="stable_svg" id="spliced_svg_div">
+                    </div>
+                    <div class="unstable_svg" id="pirna_svg_div">
+                    </div>
+                </div>
+                <br>
+                <div>
+                    <div class="card-header fs-5 fw-bold">
+                        WT_WAGOIP
+                    </div>
+                    <div class="stable_svg" id="wt_wagoip_svg_div">
                     </div>
                 </div>
             </div>

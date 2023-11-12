@@ -8,6 +8,18 @@
 from django.db import models
 
 
+class WtCrisprWago1FlagIpSrnaSeqBedgraph(models.Model):
+    index = models.BigIntegerField(blank=True, primary_key=True)
+    init_pos = models.BigIntegerField(blank=True, null=True)
+    end_pos = models.BigIntegerField(blank=True, null=True)
+    evenly_rc = models.FloatField(blank=True, null=True)
+    ref_id = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'WT_CRISPR_WAGO_1_FLAG_IP_sRNA_seq_bedgraph'
+
+
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150)
 
@@ -17,6 +29,7 @@ class AuthGroup(models.Model):
 
 
 class AuthGroupPermissions(models.Model):
+    id = models.BigAutoField(primary_key=True)
     group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
     permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
 
@@ -27,9 +40,9 @@ class AuthGroupPermissions(models.Model):
 
 
 class AuthPermission(models.Model):
+    name = models.CharField(max_length=255)
     content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING)
     codename = models.CharField(max_length=100)
-    name = models.CharField(max_length=255)
 
     class Meta:
         managed = False
@@ -40,14 +53,14 @@ class AuthPermission(models.Model):
 class AuthUser(models.Model):
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
-    is_superuser = models.BooleanField()
+    is_superuser = models.IntegerField()
     username = models.CharField(unique=True, max_length=150)
+    first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     email = models.CharField(max_length=254)
-    is_staff = models.BooleanField()
-    is_active = models.BooleanField()
+    is_staff = models.IntegerField()
+    is_active = models.IntegerField()
     date_joined = models.DateTimeField()
-    first_name = models.CharField(max_length=150)
 
     class Meta:
         managed = False
@@ -55,6 +68,7 @@ class AuthUser(models.Model):
 
 
 class AuthUserGroups(models.Model):
+    id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
     group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
 
@@ -65,6 +79,7 @@ class AuthUserGroups(models.Model):
 
 
 class AuthUserUserPermissions(models.Model):
+    id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
     permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
 
@@ -110,13 +125,13 @@ class Clashfilter(models.Model):
 
 
 class DjangoAdminLog(models.Model):
+    action_time = models.DateTimeField()
     object_id = models.TextField(blank=True, null=True)
     object_repr = models.CharField(max_length=200)
     action_flag = models.PositiveSmallIntegerField()
     change_message = models.TextField()
     content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    action_time = models.DateTimeField()
 
     class Meta:
         managed = False
@@ -134,6 +149,7 @@ class DjangoContentType(models.Model):
 
 
 class DjangoMigrations(models.Model):
+    id = models.BigAutoField(primary_key=True)
     app = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     applied = models.DateTimeField()
@@ -177,11 +193,54 @@ class Geneid(models.Model):
         db_table = 'geneid'
 
 
-class WebToolGene(models.Model):
-    gene_id = models.CharField(max_length=100)
-    transcript_id = models.CharField(max_length=100)
-    numbers = models.IntegerField()
+class WtclashHybFinalWeb(models.Model):
+    id = models.BigIntegerField(blank=True, primary_key=True)
+    clash_read = models.TextField(db_column='CLASH Read', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    region_on_clash_read_identified_as_regulator_rna = models.TextField(db_column='Region on CLASH Read identified as Regulator RNA', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    region_on_clash_read_identified_as_target_rna = models.TextField(db_column='Region on CLASH Read identified as Target RNA', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    read_count = models.TextField(db_column='Read Count', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    regulator_rna_name = models.TextField(db_column='Regulator RNA Name', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    regulator_rna_sequence = models.TextField(db_column='Regulator RNA Sequence', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    regulator_rna_region_found_in_clash_read = models.TextField(db_column='Regulator RNA Region Found in CLASH Read', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    target_rna_name = models.TextField(db_column='Target RNA Name', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    target_rna_region_found_in_clash_read = models.TextField(db_column='Target RNA Region Found in CLASH Read', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    pirscan_min_ex_binding_site = models.TextField(db_column='pirscan min_ex binding site', blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    pirscan_min_ex_target_sequence = models.TextField(db_column='pirscan min_ex Target sequence', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    pirscan_min_ex_score = models.TextField(db_column='pirscan min_ex score', blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    pirscan_max_ex_binding_site = models.TextField(db_column='pirscan max_ex binding site', blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    pirscan_max_ex_target_sequence = models.TextField(db_column='pirscan max_ex Target sequence', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    pirscan_max_ex_score = models.TextField(db_column='pirscan max_ex score', blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    rnaup_min_ex_regulator_rna_sequence = models.TextField(db_column='RNAup min_ex Regulator RNA sequence', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    rnaup_min_ex_target_rna_sequence = models.TextField(db_column='RNAup min_ex Target RNA sequence', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    rnaup_min_ex_binding_site = models.TextField(db_column='RNAup min_ex binding site', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    rnaup_min_ex_score = models.TextField(db_column='RNAup min_ex score', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    rnaup_max_ex_regulator_rna_sequence = models.TextField(db_column='RNAup max_ex Regulator RNA sequence', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    rnaup_max_ex_target_rna_sequence = models.TextField(db_column='RNAup max_ex Target RNA sequence', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    rnaup_max_ex_binding_site = models.TextField(db_column='RNAup max_ex binding site', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    rnaup_max_ex_score = models.TextField(db_column='RNAup max_ex score', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    d = models.TextField(db_column='D', blank=True, null=True)  # Field name made lowercase.
+    m = models.TextField(db_column='M', blank=True, null=True)  # Field name made lowercase.
+    wt_wago_pirscan_min_ex25_22g = models.TextField(db_column='WT_WAGO_pirscan min_ex25_22G', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    wt_wago_pirscan_max_ex25_22g = models.TextField(db_column='WT_WAGO_pirscan max_ex25_22G', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    wt_wago_rnaup_min_ex25_22g = models.TextField(db_column='WT_WAGO_RNAup min_ex25_22G', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    wt_wago_rnaup_max_ex25_22g = models.TextField(db_column='WT_WAGO_RNAup max_ex25_22G', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    mutation_count = models.BigIntegerField(blank=True, null=True)
+    mutation_pos = models.TextField(blank=True, null=True)
+    algorithm = models.TextField(blank=True, null=True)
+    pirscan_min_ex_22g_pvalue_corrected = models.TextField(db_column='pirscan min_ex 22G pvalue-corrected', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    pirscan_max_ex_22g_pvalue_corrected = models.TextField(db_column='pirscan max_ex 22G pvalue-corrected', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    rnaup_min_ex_22g_pvalue_corrected = models.TextField(db_column='RNAup min_ex 22G pvalue-corrected', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    rnaup_max_ex_22g_pvalue_corrected = models.TextField(db_column='RNAup max_ex 22G pvalue-corrected', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    mutation_string = models.TextField(blank=True, null=True)
+    prg1mut_wago1_22g_rnaup_min_ex25 = models.TextField(db_column='PRG1MUT_WAGO1_22G_RNAup min_ex25', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    prg1mut_wago1_22g_pirscan_min_ex25 = models.TextField(db_column='PRG1MUT_WAGO1_22G_pirscan min_ex25', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    prg1mut_wago1_22g_rnaup_max_ex25 = models.TextField(db_column='PRG1MUT_WAGO1_22G_RNAup max_ex25', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    prg1mut_wago1_22g_pirscan_max_ex25 = models.TextField(db_column='PRG1MUT_WAGO1_22G_pirscan max_ex25', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    wago1_22g_rnaup_min_ex25_foldchange = models.TextField(db_column='WAGO1_22G_RNAup min_ex25 foldchange', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    wago1_22g_pirscan_max_ex25_foldchange = models.TextField(db_column='WAGO1_22G_pirscan max_ex25 foldchange', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    wago1_22g_rnaup_max_ex25_foldchange = models.TextField(db_column='WAGO1_22G_RNAup max_ex25 foldchange', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    wago1_22g_pirscan_min_ex25_foldchange = models.TextField(db_column='WAGO1_22G_pirscan min_ex25 foldchange', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 
     class Meta:
         managed = False
-        db_table = 'web_tool_gene'
+        db_table = 'wtCLASH_hyb_final_web'
