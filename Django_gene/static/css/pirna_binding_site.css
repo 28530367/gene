@@ -88,12 +88,10 @@ td {
 #floating-table {
     display: none;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     border: 1px solid #ccc;
-    background-color: lightgray;
+    background-color: black;
     z-index: 1000;
     white-space: nowrap;
     text-align: center;
+    color: white;
 }

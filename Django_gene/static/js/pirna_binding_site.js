@@ -62,8 +62,8 @@ function piRNAdatatable(output_data) {
             var floatingTable = $('#floating-table');
             floatingTable.css({
                 position: 'absolute',
-                top: buttonPosition.top -220,
-                left: buttonPosition.left + 550,
+                top: buttonPosition.top - 250,
+                left: buttonPosition.left,
             });
             floatingTable.toggle();
         });
