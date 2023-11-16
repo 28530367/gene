@@ -105,7 +105,7 @@ function splicedsvg(xmaxElement, spliced_svgdata, spliced_svg_colorindex, splice
 
     // SVG 元素的尺寸
     var svgWidth = 2000;
-    var svgHeight = 125;
+    var svgHeight = 110;
 
     // 創建 spliced_svg 
     var spliced_svg = d3.select("#spliced_svg_div") // Selecting the container element
@@ -125,7 +125,7 @@ function splicedsvg(xmaxElement, spliced_svgdata, spliced_svg_colorindex, splice
         .enter()
         .append("rect")
         .attr("x", function(d, i) { return spliced_xScale(d[0]); }) // 根據數值計算 x 位置
-        .attr("y", 50)
+        .attr("y", 0)
         .attr("width", function(d, i) { return spliced_xScale(d[1]+1) - spliced_xScale(d[0]); })
         .attr("height", 30)
         .attr("fill",function(d, i) { 
@@ -144,7 +144,7 @@ function splicedsvg(xmaxElement, spliced_svgdata, spliced_svg_colorindex, splice
     .enter()
     .append("rect")
     .attr("x", function(d, i) { return spliced_xScale(d[0]); }) // 根據數值計算 x 位置
-    .attr("y", 90)
+    .attr("y", 40)
     .attr("width", function(d, i) { return spliced_xScale(d[1]+1) - spliced_xScale(d[0]); })
     .attr("height", 30)
     .attr("fill", function(d, i) {
@@ -168,10 +168,19 @@ function splicedsvg(xmaxElement, spliced_svgdata, spliced_svg_colorindex, splice
         .tickValues(customTickValues);
 
     // 在 SVG 中創建一個群組元素，用於容納 x 軸
-    spliced_svg.append("g")
+    var xAxisGroup = spliced_svg.append("g")
         .attr("class", "x-axis")
-        .attr("transform", "translate(0, 45)") 
+        .attr("transform", "translate(0, 85)")
         .call(pliced_xAxis); // 將 x 軸應用到這個群組元素上
+
+    // 修改刻度線的方向為朝下
+    xAxisGroup.selectAll(".tick line")
+        .attr("transform", "translate(0, 6)"); // 調整刻度線的位置
+
+    // 修改刻度標籤的位置為在軸的下方
+    xAxisGroup.selectAll(".tick text")
+        .attr("dy", "2.5em"); // 調整刻度標籤的垂直偏移量
+    
 }
 
 function pirnasvg(xmaxElement, pirna_svgdata, pirna_svgdata_index) {
@@ -196,7 +205,7 @@ function pirnasvg(xmaxElement, pirna_svgdata, pirna_svgdata_index) {
         .enter()
         .append("rect")
         .attr("x", function(d) { return pirna_xScale(d[0]); }) // 根據數值計算 x 位置
-        .attr("y", function(d, i) { return 18 * pirna_svgdata_index[i]; })
+        .attr("y", function(d, i) { return svgHeight - 18 * (pirna_svgdata_index[i] + 1); })
         .attr("width", function(d) { return pirna_xScale(d[1]+1) - pirna_xScale(d[0]); })
         .attr("height", 15)
         .attr("fill", "red")
@@ -267,7 +276,8 @@ $(document).ready(function(){
         type: 'GET',
         data: {text: textParam},
         success: function(response){
-
+            console.log(response.pirna_table)
+            
             var str_pirna_table = JSON.parse(response.pirna_table);
             var pirna_table = [];
             var piRNAs = response.piRNA 
