@@ -395,9 +395,12 @@ def ajax_clashfilter(request):
     else:
         df_output_data = df_clashfilter
     
+    print(type(df_output_data['readcount'][0]))
     
     def get_row(dataframe, column, mode, value):
 
+        dataframe[column] = pd.to_numeric(dataframe[column], errors='coerce')
+        
         if mode == 1:
             output = dataframe[dataframe[column] > value]
         elif mode == 2:

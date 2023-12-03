@@ -103,6 +103,8 @@ function piRNAdatatable(output_data) {
 
 function splicedsvg(xmaxElement, spliced_svgdata, spliced_svg_colorindex, spliced_exon_svgdata, spliced_exon_svg_colorindex) {
 
+    const tooltip = d3.select(".tooltip");
+
     // SVG 元素的尺寸
     var svgWidth = 2000;
     var svgHeight = 110;
@@ -136,7 +138,22 @@ function splicedsvg(xmaxElement, spliced_svgdata, spliced_svg_colorindex, splice
             }
         })
         .attr("stroke", "black") // 添加黑色邊框
-        .attr("stroke-width", 1); // 設置邊框寬度為1像素
+        .attr("stroke-width", 1) // 設置邊框寬度為1像素
+        .attr("data-info", function(d, i) {
+            // 將相關數據添加為自定義數據屬性
+            return "start:" + d[0] + "<br>stop:" + d[1];
+        })
+        .on('mousemove', function(event, d){
+            var info = d3.select(this).attr("data-info");
+            tooltip.style("opacity", 1)
+                    .style('left', (event.layerX) + 'px') // 設定tooltips位置
+                    .style('top', (event.layerY + 100) + 'px')
+                    .html(info)
+        })
+        // 滑鼠移出事件：隱藏tooltip
+        .on("mouseout", function() {
+            tooltip.style("opacity", 0);
+        });
 
     // 創建 spliced_exon 矩形
     spliced_svg.selectAll("rect.exon-rect")
@@ -155,7 +172,22 @@ function splicedsvg(xmaxElement, spliced_svgdata, spliced_svg_colorindex, splice
         }
     })
     .attr("stroke", "black") // 添加黑色邊框
-    .attr("stroke-width", 1); // 設置邊框寬度為1像素
+    .attr("stroke-width", 1) // 設置邊框寬度為1像素
+    .attr("data-info", function(d, i) {
+        // 將相關數據添加為自定義數據屬性
+        return "start:" + d[0] + "<br>stop:" + d[1];
+    })
+    .on('mousemove', function(event, d){
+        var info = d3.select(this).attr("data-info");
+        tooltip.style("opacity", 1)
+                .style('left', (event.layerX) + 'px') // 設定tooltips位置
+                .style('top', (event.layerY + 100) + 'px')
+                .html(info)
+    })
+    // 滑鼠移出事件：隱藏tooltip
+    .on("mouseout", function() {
+        tooltip.style("opacity", 0);
+    });
     
     var customTickValues = [1];
     for (var i = 100; i <= xmaxElement; i += 100) {
@@ -215,6 +247,8 @@ function pirnasvg(xmaxElement, pirna_svgdata, pirna_svgdata_index) {
 
 function wtwagoipsvg(xmaxElement, wt_wagoip_svgdata) {
 
+    const tooltip = d3.select(".tooltip");
+
     let Column2 = wt_wagoip_svgdata.map(row => row[2]);
     let ymaxElement = Math.max(...Column2);
 
@@ -246,6 +280,21 @@ function wtwagoipsvg(xmaxElement, wt_wagoip_svgdata) {
         .attr("width", function(d) { return wt_wagoip_xScale(d[1]+1) - wt_wagoip_xScale(d[0]); })
         .attr("height", function(d) { return wt_wagoip_yScale(d[2]); })
         .attr("fill", "darkblue")
+        .attr("data-info", function(d, i) {
+            // 將相關數據添加為自定義數據屬性
+            return d[2];
+        })
+        .on('mousemove', function(event, d){
+            var info = d3.select(this).attr("data-info");
+            tooltip.style("opacity", 1)
+                    .style('left', (event.layerX) + 'px') // 設定tooltips位置
+                    .style('top', (event.layerY + 120) + 'px')
+                    .html(info)
+        })
+        // 滑鼠移出事件：隱藏tooltip
+        .on("mouseout", function() {
+            tooltip.style("opacity", 0);
+        });
 
     var customTickValues = [1];
     for (var i = 100; i <= xmaxElement; i += 100) {

@@ -91,7 +91,7 @@ class AuthUserUserPermissions(models.Model):
 
 class Clashfilter(models.Model):
     clashread = models.TextField(db_column='CLASHRead', primary_key=True, blank=True)  # Field name made lowercase.
-    readcount = models.IntegerField(blank=True, null=True)
+    readcount = models.FloatField(blank=True, null=True)
     smallrnaname = models.TextField(db_column='SmallRNAName', blank=True, null=True)  # Field name made lowercase.
     regiononclashreadidentifiedassmallrna = models.TextField(db_column='RegiononCLASHReadidentifiedasSmallRNA', blank=True, null=True)  # Field name made lowercase.
     smallrnaregionfoundinclashread = models.TextField(db_column='SmallRNARegionFoundinCLASHRead', blank=True, null=True)  # Field name made lowercase.

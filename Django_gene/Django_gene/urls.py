@@ -22,4 +22,5 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('web_tool/', include('web_tool.urls')),
+    path('DEIso/', include('cancer_DEIso.urls')),
 ]
