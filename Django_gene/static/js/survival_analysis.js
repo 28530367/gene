@@ -28,12 +28,28 @@ function download_btn() {
     $('#Download_csv').append(link);
 }
 
+
 $(document).ready(function(){
     $('.submit').click(function(){
         const loadingContainer = $('#loading-container');
-        const loadingbackground = $('#loading-background')
+        const loadingbackground = $('#loading-background');
+        const secondsCounter = $("#secondsCounter");
         loadingContainer.show();
         loadingbackground.show();
+        secondsCounter.show();
+        
+        let seconds = 0;
+        
+        function countSeconds() {
+            seconds++;
+            $("#secondsCounter").text(seconds);
+        }
+        // Call countSeconds every second (1000 milliseconds)
+        let intervalId = setInterval(countSeconds, 1000);
+        // To stop counting after a certain period (e.g., 10 seconds), you can use setTimeout
+        setTimeout(function() {
+          clearInterval(intervalId); // Stop the interval after 10 seconds
+        }, 60000);
 
         var formData = {};
         $('input, select').each(function () {
@@ -47,6 +63,8 @@ $(document).ready(function(){
             success: function(response){
                 loadingContainer.hide();
                 loadingbackground.hide();
+                secondsCounter.hide();
+
                 if (response.error == '') {
                     $('#output').css('visibility', '');
                     download_btn()

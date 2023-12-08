@@ -6,10 +6,17 @@ import matplotlib.pyplot as plt
 import matplotlib
 import pandas as pd
 import csv
+from functools import partial
+import multiprocessing
+import time
+from lifelines.statistics import logrank_test
 
 file_path = os.path.dirname(os.path.abspath(__file__))
+
 class Survival_plot():
-	def survival_data_realtime(project, column_table,search_by,GT_input):
+	def __init__(self) -> None:
+		pass
+	def survival_data_realtime(self, project, column_table,search_by,GT_input):
 		stage_dict = {
 			'stage i' : 'stage_1',
 			'stage ii' : 'stage_2',
@@ -38,7 +45,7 @@ class Survival_plot():
 		result = df_result.drop(columns= [f"{primary_key}"]).values.tolist()[0]
 		return result
 
-	def survival_plot(T1,E1,T2,E2,GT_input,primary_site,random_id,Low_Percentile,High_Percentile,survival_days,survival_select):
+	def survival_plot(self, T1,E1,T2,E2,GT_input,primary_site,random_id,Low_Percentile,High_Percentile,survival_days,survival_select):
 		# from lifelines.estimation import KaplanMeierFitter
 		from lifelines import KaplanMeierFitter
 		from lifelines.statistics import logrank_test
@@ -91,7 +98,7 @@ class Survival_plot():
 		
 		return logrank_p_value
 
-	def survival_download(T1,E1,T2,E2,high_case,low_case,high_FPKM,low_FPKM,GT_input,primary_site,random_id,Low_Percentile,High_Percentile,survival_select):
+	def survival_download(self, T1,E1,T2,E2,high_case,low_case,high_FPKM,low_FPKM,GT_input,primary_site,random_id,Low_Percentile,High_Percentile,survival_select):
 		output_data = [
 						['Query: %s'%(GT_input)],
 						['Primary site: %s'%(primary_site)],
@@ -117,132 +124,226 @@ class Survival_plot():
 				writer.writerow(e)
 		
 		return output_data
+	
+	def survival_plot_realtime(self, request:dict):
+		project = request['project']
+		# ex: TCGA-COAD
+		primary_site = request['primary_site']
+		# ex: Adrenal Gland Adrenocortical Carcinoma
+		search_by = request['search_by']
+		GT_input = request['GT_input']
+		random_id = request['random_id']
+		Low_Percentile = request['Low_Percentile']
+		High_Percentile = request['High_Percentile']
+		survival_days = request['survival_days']
+		survival_select = request['survival_select']
+		# stage : all stage, stage i, stage ii, stage iii, stage iv
+		table_name = '%s_%s_FPKM_Cufflinks'%(project,search_by)
+		column_table = "%s|%s"%(survival_select,table_name)
+	#### patched by t50504
+		survival_data = self.survival_data_realtime(project, column_table,search_by,GT_input)
+		survival_str = ""
+		case_id_list = []
 
-def survival_plot_realtime(request:dict):
-	project = request['project']
-	# ex: TCGA-COAD
-	primary_site = request['primary_site']
-	# ex: Adrenal Gland Adrenocortical Carcinoma
-	search_by = request['search_by']
-	GT_input = request['GT_input']
-	random_id = request['random_id']
-	Low_Percentile = request['Low_Percentile']
-	High_Percentile = request['High_Percentile']
-	survival_days = request['survival_days']
-	survival_select = request['survival_select']
-	# stage : all stage, stage i, stage ii, stage iii, stage iv
-	table_name = '%s_%s_FPKM_Cufflinks'%(project,search_by)
-	column_table = "%s|%s"%(survival_select,table_name)
- #### patched by t50504
-	survival_data = Survival_plot.survival_data_realtime(project, column_table,search_by,GT_input)
-	survival_str = ""
-	case_id_list = []
+		FPKM_list = [float(y.split("|")[0]) for x in survival_data for y in x.split(',')]
+		low_quartile = np.percentile(FPKM_list, float(Low_Percentile))
+		high_quartile = np.percentile(FPKM_list, 100-float(High_Percentile))
 
-	FPKM_list = [float(y.split("|")[0]) for x in survival_data for y in x.split(',')]
-	low_quartile = np.percentile(FPKM_list, float(Low_Percentile))
-	high_quartile = np.percentile(FPKM_list, 100-float(High_Percentile))
+		T1 = [] #high 存活天數
+		E1 = [] #high 是否死亡
+		T2 = []
+		E2 = []
+		high_case = []
+		low_case = []
+		high_FPKM = []
+		low_FPKM = []
 
-	T1 = [] #high 存活天數
-	E1 = [] #high 是否死亡
-	T2 = []
-	E2 = []
-	high_case = []
-	low_case = []
-	high_FPKM = []
-	low_FPKM = []
+		for stage in survival_data:
+			for info in stage.split(','):
+				FPKM = float(info.split('|')[0])
+				case_id = info.split('|')[1]
 
-	for stage in survival_data:
-		for info in stage.split(','):
+				survival_times = float(info.split('|')[2]) if info.split('|')[2] != 'None' else info.split('|')[2] #存活天數
+				# print(case_id,survival_times)
+				survival_events = False if info.split('|')[3] == 'alive' else True #是否死亡
+				if FPKM > high_quartile and (survival_times != 0 and survival_times != 'None') and survival_times <= float(survival_days):
+					T1 += [survival_times]
+					E1 += [survival_events]
+					case_id_list += [case_id]
+					high_case += [case_id]
+					high_FPKM += [FPKM]
+				elif FPKM < low_quartile and (survival_times != 0 and survival_times != 'None') and survival_times <= float(survival_days):
+					T2 += [survival_times]
+					E2 += [survival_events]
+					case_id_list += [case_id]
+					low_case += [case_id]
+					low_FPKM += [FPKM]
+
+		if (T2 != [] and E2 != []) and (T1 != [] and E1 != []):
+			self.survival_plot(T1,E1,T2,E2,GT_input,primary_site,random_id,Low_Percentile,High_Percentile,max(T1+T2),survival_select)
+			survival_download = self.survival_download(T1,E1,T2,E2,high_case,low_case,high_FPKM,low_FPKM,GT_input,primary_site,random_id,Low_Percentile,High_Percentile,survival_select)
+			# request.session["Survival_Profile_%s_%s_%s_%s"%(primary_site.replace('(','').replace(')',''),Low_Percentile,High_Percentile,random_id)] = survival_download
+		else:
+			survival_str = ' Survival analysis is not available for '+GT_input+' since more than half of the samples have zero expression.'
+
+	def survival_max_days(self ,project, GT_input, search_by, survival_select) -> float:
+
+		# project = request.POST['project']
+		# GT_input = request.POST['GT_input']
+		# search_by = request.POST['search_by']
+		# survival_select = request.POST['survival_select']
+		# project = request['project']
+		# GT_input = request['GT_input']
+		# search_by = request['search_by']
+		# survival_select = request['survival_select']
+
+		table_name = '%s_%s_FPKM_Cufflinks'%(project,search_by)
+		column_table = "%s|%s"%(survival_select,table_name)
+
+		survival_data = "".join(self.survival_data_realtime(project, column_table,search_by,GT_input)).split(",")
+		# survival_days = [float(y.split("|")[2]) for x in survival_data for y in x.split(',')]
+		# survival_days = list(map(lambda x:x.split("|")[2],survival_data))
+		# df = pd.read_csv(f"{file_path}/data/{project}_{search_by}_FPKM_Cufflinks.csv")
+		
+		# survival_data = 
+		survival_days = [float(x.split("|")[2]) for x in survival_data if x.split("|")[2] != 'None']
+		max_survival_days = max(survival_days)
+		return max_survival_days
+		# return JsonResponse({"max_survival_days": max_survival_days})
+
+class Survival_screener():
+	def __init__(self) -> None:
+		pass
+
+	def survival_read_csv(self, project, column_table, search_by):
+		stage_dict = {
+			'stage i' : 'stage_1',
+			'stage ii' : 'stage_2',
+			'stage iii' : 'stage_3',
+			'stage iv' : 'stage_4',
+		}
+		df = pd.read_csv(f"{file_path}/data/{project}_{search_by}_FPKM_Cufflinks.csv")
+
+		primary_key = 'gene_name' if search_by == 'genes' else 'isoform_name'
+		selected_columns = [primary_key]
+
+		if column_table.split('|')[0] != 'all stage':
+			print(column_table.split('|')[0])
+			selected_columns += [stage_dict[column_table.split('|')[0]]]
+		else:
+			data_columns = df.columns.tolist()
+			data_columns = data_columns[1:]
+			selected_columns = [primary_key]
+			for e in data_columns:
+				if e != 'normal' and e !='all_stage' and e != 'pvalue(normal_allstage)' and e != 'pvalue(allstage_normal)':
+					selected_columns.append(e)
+					
+		df = df[selected_columns]
+		result = df.values.tolist()
+
+		return result
+
+	def get_logrank_p_value(self, record, Low_Percentile, High_Percentile, search_by):
+
+		primary_key = 'gene_name' if search_by == 'genes' else 'isoform_name'
+		# Extract the first element (gene_name)
+		primary_name = record[0]
+
+		# Concatenate the remaining elements into a single string
+		concatenated_values = ','.join(record[1:])
+
+		FPKM_list = [float(x.split("|")[0]) for x in concatenated_values.split(',')]
+		low_quartile = np.percentile(FPKM_list, float(Low_Percentile))
+		high_quartile = np.percentile(FPKM_list, 100-float(High_Percentile))
+
+		T1 = [] #high 存活天數
+		E1 = [] #high 是否死亡
+		T2 = []
+		E2 = []
+
+		for info in concatenated_values.split(','):
 			FPKM = float(info.split('|')[0])
-			case_id = info.split('|')[1]
 
 			survival_times = float(info.split('|')[2]) if info.split('|')[2] != 'None' else info.split('|')[2] #存活天數
 			# print(case_id,survival_times)
 			survival_events = False if info.split('|')[3] == 'alive' else True #是否死亡
-			if FPKM > high_quartile and (survival_times != 0 and survival_times != 'None') and survival_times <= float(survival_days):
+			if FPKM > high_quartile and (survival_times != 0 and survival_times != 'None'):
 				T1 += [survival_times]
 				E1 += [survival_events]
-				case_id_list += [case_id]
-				high_case += [case_id]
-				high_FPKM += [FPKM]
-			elif FPKM < low_quartile and (survival_times != 0 and survival_times != 'None') and survival_times <= float(survival_days):
+			elif FPKM < low_quartile and (survival_times != 0 and survival_times != 'None'):
 				T2 += [survival_times]
-				E2 += [survival_events]
-				case_id_list += [case_id]
-				low_case += [case_id]
-				low_FPKM += [FPKM]
+				E2 += [survival_events]	
+		try:
+			logrank_result = logrank_test(T1, T2, E1, E2)
+			logrank_p_value = logrank_result.p_value
+		except:
+			logrank_p_value = 1
 
-	if (T2 != [] and E2 != []) and (T1 != [] and E1 != []):
-		Survival_plot.survival_plot(T1,E1,T2,E2,GT_input,primary_site,random_id,Low_Percentile,High_Percentile,max(T1+T2),survival_select)
-		survival_download = Survival_plot.survival_download(T1,E1,T2,E2,high_case,low_case,high_FPKM,low_FPKM,GT_input,primary_site,random_id,Low_Percentile,High_Percentile,survival_select)
-		# request.session["Survival_Profile_%s_%s_%s_%s"%(primary_site.replace('(','').replace(')',''),Low_Percentile,High_Percentile,random_id)] = survival_download
-	else:
-		survival_str = ' Survival analysis is not available for '+GT_input+' since more than half of the samples have zero expression.'
-
-def survival_max_days(project, GT_input, search_by, survival_select) -> float:
-
-	# project = request.POST['project']
-	# GT_input = request.POST['GT_input']
-	# search_by = request.POST['search_by']
-	# survival_select = request.POST['survival_select']
-	# project = request['project']
-	# GT_input = request['GT_input']
-	# search_by = request['search_by']
-	# survival_select = request['survival_select']
-
-	table_name = '%s_%s_FPKM_Cufflinks'%(project,search_by)
-	column_table = "%s|%s"%(survival_select,table_name)
-
-	survival_data = "".join(Survival_plot.survival_data_realtime(project, column_table,search_by,GT_input)).split(",")
-	# survival_days = [float(y.split("|")[2]) for x in survival_data for y in x.split(',')]
-	# survival_days = list(map(lambda x:x.split("|")[2],survival_data))
-	# df = pd.read_csv(f"{file_path}/data/{project}_{search_by}_FPKM_Cufflinks.csv")
+		result_element = {primary_key: primary_name, 'p_value': logrank_p_value}
+		return result_element
 	
-	# survival_data = 
-	survival_days = [float(x.split("|")[2]) for x in survival_data if x.split("|")[2] != 'None']
-	max_survival_days = max(survival_days)
-	return max_survival_days
-	# return JsonResponse({"max_survival_days": max_survival_days})
+	def controller(self, request:dict):
+
+		search_by = request['search_by']
+		project = request['project']
+		Low_Percentile = request['Low_Percentile']
+		High_Percentile = request['High_Percentile']
+		survival_select = request['survival_select']
+
+		result = []
+
+		table_name = '%s_%s_FPKM_Cufflinks'%(project,search_by)
+		column_table = "%s|%s"%(survival_select,table_name)
+
+		survival_data = self.survival_read_csv(project, column_table, search_by)
+
+		pool_obj = multiprocessing.Pool(multiprocessing.cpu_count())
+		partial_get_logrank_p_value = partial(self.get_logrank_p_value, Low_Percentile=Low_Percentile, High_Percentile=High_Percentile, search_by=search_by)
+		result_element = pool_obj.map(partial_get_logrank_p_value, survival_data)
+		result.append(result_element)
+
+		return result
 
 if __name__ == "__main__":
+
+	ss = Survival_screener()
 	## cancer ➔ project table
 	# ex : python3 survival_analysis.py -p TCGA-ACC --primary_site Adrenal_Gland_Adrenocortical_Carcinoma -t genes -n KIF23 --Low_Percentile 50 --High_Percentile 50 --survival_days 4628 --survival_select all_stage
 	# ex : python3 survival_analysis.py -p TCGA-ACC --primary_site Adrenal_Gland_Adrenocortical_Carcinoma -t isoforms -n NM_000014 --Low_Percentile 50 --High_Percentile 50 --survival_days 4673 --survival_select all_stage
 	# stage argument :stage_i, stage_ii, stage_iii, stage_iv
-	parser = ArgumentParser()
-	parser.add_argument("-p", "--project")
-	parser.add_argument("--primary_site")
-	parser.add_argument("-t", "--type", help="input type isoforms or genes")
-	parser.add_argument("-n", "--name", help="input isoform or gene name")
-	parser.add_argument("--Low_Percentile")
-	parser.add_argument("--High_Percentile")
-	parser.add_argument("--survival_days")
-	parser.add_argument("--survival_select")
-	args = parser.parse_args()
-	# input_project = parser.project
 	input_project = "TCGA-ACC"
-	input_primary_site = args.primary_site
+	input_primary_site = "Adrenal_Gland_Adrenocortical_Carcinoma"
 	input_primary_site = input_primary_site.replace("_", " ")
-	input_type = args.type
-	input_name = args.name
-	Low_Percentile = args.Low_Percentile
-	High_Percentile = args.High_Percentile
-	survival_days = args.survival_days
-	survival_select = args.survival_select.replace("_", " ")
-	if survival_max_days(input_project, input_name, input_type, survival_select)+5 < float(survival_days) or 0 > float(survival_days):
-		print(f"maxmium days is {survival_max_days(input_project, input_name, input_type, survival_select)}")
-		print("input days error")
-	else: 
-		plot_arg = {
-			# 'project':args.project,
-			'project':"TCGA-ACC",
-			'primary_site': input_primary_site,
-			'search_by': input_type,
-			'GT_input': input_name,
-			"random_id": "",
-			'Low_Percentile': Low_Percentile,
-			'High_Percentile': High_Percentile,
-			'survival_days': survival_days,
-			'survival_select': survival_select,
-		}
-		survival_plot_realtime(plot_arg)
+	input_type = "genes"
+	input_name = "AAGAB"
+	Low_Percentile = 50
+	High_Percentile = 50
+	survival_days = 4628
+	survival_select = "all_stage"
+	survival_select = survival_select.replace("_", " ")
+
+	plot_arg = {
+		# 'project':args.project,
+		'project':"TCGA-ACC",
+		'primary_site': input_primary_site,
+		'search_by': input_type,
+		'GT_input': input_name,
+		"random_id": "",
+		'Low_Percentile': Low_Percentile,
+		'High_Percentile': High_Percentile,
+		'survival_days': survival_days,
+		'survival_select': survival_select,
+	}
+	start_time = time.time()
+
+	result = ss.controller(plot_arg)
+	
+	end_time = time.time()
+	print(result)
+	print(end_time-start_time)
+
+
+
+
+
+
