@@ -243,7 +243,7 @@ class Survival_screener():
 
 		return result
 
-	def get_logrank_p_value(self, record, Low_Percentile, High_Percentile, search_by):
+	def get_logrank_p_value(self, record, Low_Percentile, High_Percentile, search_by, max_p_value):
 
 		primary_key = 'gene_name' if search_by == 'genes' else 'isoform_name'
 		# Extract the first element (gene_name)
@@ -279,8 +279,12 @@ class Survival_screener():
 		except:
 			logrank_p_value = 1
 
-		result_element = {primary_key: primary_name, 'p_value': logrank_p_value}
-		return result_element
+		if logrank_p_value <= max_p_value:
+			scientific_format_logrank_p_value = '{:.3e}'.format(logrank_p_value)
+			result = {'name': primary_name, 'p_value': scientific_format_logrank_p_value}
+			return result
+		
+		return 
 	
 	def controller(self, request:dict):
 
@@ -289,8 +293,7 @@ class Survival_screener():
 		Low_Percentile = request['Low_Percentile']
 		High_Percentile = request['High_Percentile']
 		survival_select = request['survival_select']
-
-		result = []
+		max_p_value = request['max_p_value']
 
 		table_name = '%s_%s_FPKM_Cufflinks'%(project,search_by)
 		column_table = "%s|%s"%(survival_select,table_name)
@@ -298,9 +301,8 @@ class Survival_screener():
 		survival_data = self.survival_read_csv(project, column_table, search_by)
 
 		pool_obj = multiprocessing.Pool(multiprocessing.cpu_count())
-		partial_get_logrank_p_value = partial(self.get_logrank_p_value, Low_Percentile=Low_Percentile, High_Percentile=High_Percentile, search_by=search_by)
-		result_element = pool_obj.map(partial_get_logrank_p_value, survival_data)
-		result.append(result_element)
+		partial_get_logrank_p_value = partial(self.get_logrank_p_value, Low_Percentile=Low_Percentile, High_Percentile=High_Percentile, search_by=search_by, max_p_value=max_p_value)
+		result = pool_obj.map(partial_get_logrank_p_value, survival_data)
 
 		return result
 
@@ -321,6 +323,7 @@ if __name__ == "__main__":
 	survival_days = 4628
 	survival_select = "all_stage"
 	survival_select = survival_select.replace("_", " ")
+	input_p_value = 0.5
 
 	plot_arg = {
 		# 'project':args.project,
@@ -333,6 +336,7 @@ if __name__ == "__main__":
 		'High_Percentile': High_Percentile,
 		'survival_days': survival_days,
 		'survival_select': survival_select,
+		'max_p_value': input_p_value
 	}
 	start_time = time.time()
 
