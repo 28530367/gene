@@ -48,8 +48,8 @@ $(document).ready(function(){
         let intervalId = setInterval(countSeconds, 1000);
         // To stop counting after a certain period (e.g., 10 seconds), you can use setTimeout
         setTimeout(function() {
-          clearInterval(intervalId); // Stop the interval after 10 seconds
-        }, 60000);
+          clearInterval(intervalId); // Stop the interval after 3 min
+        }, 180000);
 
         var formData = {};
         $('input, select').each(function () {

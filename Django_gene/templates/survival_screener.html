@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Survival Screener {% endblock %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/survival_screener.css' %}">
+{% endblock %}
+{% block content %}
+<div id="container">
+    <div class="card-body text-dark">
+        <div class="card my-4">
+            <div class="card-header fs-5 fw-bold">
+                Search
+            </div>
+            <div width="100%" align="center">
+                <form class="form-horizontal SearchForm" style="border-top-left-radius:0;">
+                    <br>
+                    <div class="FormOption">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Select type : </label>
+                            <div class="searchable-container">
+                                <div id="radioBtn" class="row">
+                                    <div class="col-sm-3"></div>
+                                    <div class="col-sm-3">
+                                        <a class="btn btn-primary btn-lg active btn-toggle" data-toggle="DE_level" data-title="genes">DE Genes</a>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <a class="btn btn-primary btn-lg notActive btn-toggle" data-toggle="DE_level" data-title="isoforms">DE Isoforms</a>
+                                    </div>
+                                    <div class="col-sm-3"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="FormOption">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Select a cancer : </label>
+                            <div class="col-sm-6">
+                                <div id="primary_site_div">
+                                    <select class="form-control select2-hidden-accessible" id="primary_select" style="width: 100%" name="select_element" tabindex="-1" aria-hidden="true">
+                                        <option value="Adrenal Gland (Adrenocortical Carcinoma)|TCGA-ACC">Adrenal Gland (Adrenocortical Carcinoma) cancer</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                    <br>
+                    <div class="FormOption">
+                        <div class="form-group">
+                            <div class="searchable-container">
+                                <div id="radioBtn" class="row">
+                                    <div class="col-sm-4"></div>
+                                    <div class="col-sm-2">
+                                        <label>High Percentile : </label>
+                                        <input type="text" class="form-control" name="High_Percentile" placeholder="High Percentile" value="50">
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label>Low Percentile : </label>
+                                        <input type="text" class="form-control" name="Low_Percentile" placeholder="Low Percentile" value="50">
+                                    </div>
+                                    <div class="col-sm-4"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                    <br>
+                    <div class="FormOption">
+                        <div class="form-group">
+                            <div class="searchable-container">
+                                <div id="radioBtn" class="row">
+                                    <div class="col-sm-4"></div>
+                                    <div class="col-sm-4">
+                                        <label>Max p-value : </label>
+                                        <input type="text" class="form-control" name="max_p_value" placeholder="Max p-value" value="0.5">
+                                    </div>
+                                    <div class="col-sm-4"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <button type="button" value="search" id="send" class="btn btn-primary submit">Search</button>
+                    </div>
+                    <br>
+                </form>
+            </div>
+        </div>
+        <div id="output" class="card my-4">
+            <div class="card-header fs-5 fw-bold">
+                Output
+            </div>
+            <div width="100%" align="center"> 
+            </div>
+        </div>
+	</div>
+</div>
+<script src="{% static 'js/survival_screener.js' %}"></script>
+{% endblock %}

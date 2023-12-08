@@ -1,0 +1,42 @@
+.searchable-container {
+    margin: 0px 0 0 0;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    margin-top: 15px;
+    margin-right: 50px;
+    margin-left: 50px;
+}
+
+.form-horizontal {
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.FormOption {
+    width: 90%;
+    -webkit-box-shadow: inset 0 2px 0 rgba(255,255,255,.15), 0 2px 5px rgba(0,0,0,.075);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.15), 0 2px 5px rgba(0,0,0,.075);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #FFF;
+}
+
+.notActive {
+    background-color: white;
+    color: rgb(37, 105, 250);
+}
+
+.active {
+    background-color: rgb(37, 105, 250);
+    color: white;
+}
+
+#radioBtn {
+    text-align: center; /* Center the child elements horizontally */
+}
+
+.btn-toggle {
+    width: 70%;
+}

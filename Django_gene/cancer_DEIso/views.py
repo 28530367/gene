@@ -10,7 +10,7 @@ def survival_analyis(request):
     return render(request, 'survival_analyis.html', locals())
 
 def ajax_survival_analyis(request):
-    sp = Survival_plot()
+    plot = Survival_plot()
     input_project = "TCGA-ACC"
     input_primary_site = "Adrenal_Gland_Adrenocortical_Carcinoma"
     input_primary_site = input_primary_site.replace("_", " ")
@@ -21,11 +21,11 @@ def ajax_survival_analyis(request):
     survival_days = request.POST['input_days']
     survival_select = request.POST['samples_select'].replace("_", " ")
     	
-    if sp.survival_max_days(input_project, input_name, input_type, survival_select)+5 < float(survival_days) or 0 > float(survival_days):
-        print(f"maxmium days is {sp.survival_max_days(input_project, input_name, input_type, survival_select)}")
+    if plot.survival_max_days(input_project, input_name, input_type, survival_select)+5 < float(survival_days) or 0 > float(survival_days):
+        print(f"maxmium days is {plot.survival_max_days(input_project, input_name, input_type, survival_select)}")
         print("input days error")
         response = {
-            'error': f"maxmium days is {sp.survival_max_days(input_project, input_name, input_type, survival_select)}",
+            'error': f"maxmium days is {plot.survival_max_days(input_project, input_name, input_type, survival_select)}",
         }
     else: 
         plot_arg = {
@@ -39,7 +39,7 @@ def ajax_survival_analyis(request):
             'survival_days': survival_days,
             'survival_select': survival_select,
         }
-        sp.survival_plot_realtime(plot_arg)
+        plot.survival_plot_realtime(plot_arg)
 
         with open('/home/shouweihuang/Lab_Training/gene/Django_gene/static/image/survival_plot.png', 'rb') as f:
             image_data = f.read()
@@ -51,3 +51,8 @@ def ajax_survival_analyis(request):
         }
 
     return JsonResponse(response)
+
+'----------------------------------------------------------survival_screener---------------------------------------------------------------'
+def survival_screener(request):
+
+    return render(request, 'survival_screener.html', locals())
