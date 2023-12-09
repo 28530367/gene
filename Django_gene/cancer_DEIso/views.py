@@ -56,3 +56,32 @@ def ajax_survival_analyis(request):
 def survival_screener(request):
 
     return render(request, 'survival_screener.html', locals())
+
+def ajax_survival_screener(request):
+    screener = Survival_screener()
+
+    input_project = "TCGA-ACC"
+    input_primary_site = "Adrenal_Gland_Adrenocortical_Carcinoma"
+    input_primary_site = input_primary_site.replace("_", " ")
+    input_type = request.POST['type']
+    low_Percentile = int(request.POST['Low_Percentile'])
+    high_Percentile = int(request.POST['High_Percentile'])
+    max_p_value = float(request.POST['max_p_value'])
+    survival_select = request.POST['samples_select'].replace("_", " ")
+
+    plot_arg = {
+        'project': input_project,
+        'primary_site': input_primary_site,
+        'search_by': input_type,
+        'Low_Percentile': low_Percentile,
+        'High_Percentile': high_Percentile,
+        'max_p_value': max_p_value,
+        'survival_select': survival_select,
+    }
+    table_data = screener.controller(plot_arg)
+
+    response = {
+        'table_data': table_data,
+    }
+
+    return JsonResponse(response)

@@ -284,7 +284,7 @@ class Survival_screener():
 			result = {'name': primary_name, 'p_value': scientific_format_logrank_p_value}
 			return result
 		
-		return 
+		return
 	
 	def controller(self, request:dict):
 
@@ -303,6 +303,7 @@ class Survival_screener():
 		pool_obj = multiprocessing.Pool(multiprocessing.cpu_count())
 		partial_get_logrank_p_value = partial(self.get_logrank_p_value, Low_Percentile=Low_Percentile, High_Percentile=High_Percentile, search_by=search_by, max_p_value=max_p_value)
 		result = pool_obj.map(partial_get_logrank_p_value, survival_data)
+		result = [r for r in result if r is not None]
 
 		return result
 

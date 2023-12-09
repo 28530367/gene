@@ -82,6 +82,28 @@
                         <br>
                     </div>
                     <br>
+                    <div class="FormOption">
+                        <div class="form-group">
+                            <div class="searchable-container">
+                                <div id="radioBtn" class="row">
+                                    <div class="col-sm-4"></div>
+                                    <div class="col-sm-4">
+                                        <label>Samples Included : </label>
+                                        <select id="survival_select_Adrenal Gland Adrenocortical Carcinoma" style="height: 22px;width: 100%;" name="samples_select">
+                                            <option value="all stage">All Cancer Stages</option>
+                                            <option value="stage i">Only stage i</option>
+                                            <option value="stage ii">Only stage ii</option>
+                                            <option value="stage iii">Only stage iii</option>
+                                            <option value="stage iv">Only stage iv</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                    <br>
                     <div class="form-group">
                         <button type="button" value="search" id="send" class="btn btn-primary submit">Search</button>
                     </div>
@@ -94,6 +116,7 @@
                 Output
             </div>
             <div width="100%" align="center"> 
+                <div id="table"></div>
             </div>
         </div>
 	</div>

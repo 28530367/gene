@@ -7,81 +7,8 @@
 {% block content %}
 <div id="container">
     <div class="card-body text-dark">
-        <div class="card my-4">
-            <div class="card-header fs-5 fw-bold">
-                Search
-            </div>
-            <div width="100%" align="center">
-                <form class="form-horizontal SearchForm" style="border-top-left-radius:0;">
-                    <br>
-                    <div class="FormOption">
-                        <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">Input a gene name : </label>
-                            <div class="col-sm-5">
-                                <div class="input-group">
-                                    <div class="btn-group bootstrap-select">
-                                        <div class="dropdown-menu open" role="combobox" style="max-height: 643px; overflow: hidden; min-height: 0px;">
-                                            <ul class="dropdown-menu inner" role="listbox" aria-expanded="false" style="max-height: 631px; overflow-y: auto; min-height: 0px;">
-                                                <li data-original-index="0" class="selected">
-                                                    <a tabindex="0" class="" data-tokens="null" role="option" aria-disabled="false" aria-selected="true">
-                                                        <span class="text">Gene symbol</span>
-                                                        <span class="glyphicon glyphicon-ok check-mark"></span>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <select class="selectpicker" name="input_element" id="GT_select" tabindex="-98">
-                                            <option value="genes" data-title="genes" data-placeholder="gene symbol">Gene symbol</option>
-                                        </select>
-                                    </div>
-                                    <input type="text" id="GT_input" name="input_element" class="form-control ui-autocomplete-input" placeholder="gene symbol" style="position:initial;border:1px solid #245580;border-left:0" autocomplete="off">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="FormOption">
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">Select Cancer : </label>
-                            
-                            <div class="col-sm-5">
-                                <div class="table-responsive">  
-                                    <table class="table table-bordered table-hover text-center dataTable no-footer" id="primary_site_table">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-center" style="width: 10%;background-color: #8B0000; color: #FFFFFF"></th>
-                                                <th class="text-center" style="width: 10%;background-color: #8B0000; color: #FFFFFF">Cancer</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr style="background-color: rgb(238, 238, 238);">
-                                                <td style="vertical-align: middle;">
-                                                    <label>
-                                                        <input class="header" type="radio" name="primary_check_element" value="Adrenal Gland (Adrenocortical Carcinoma)|TCGA-ACC" style="width: 20px;height: 20px;" checked="checked">
-                                                    </label>
-                                                </td>
-                                                <td style="vertical-align: middle;">Adrenal Gland (Adrenocortical Carcinoma)</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="FormOption">
-                        <div class="form-group">
-                            <button type="button" value="search" id="send" class="btn btn-primary submit">Search</button>
-                        </div>
-                    </div>
-                    <br>
-                </form><br><br><br><br>     
-            </div>
-        </div>
-        <div id="output" class="card my-4" style="visibility: hidden;">
-            <div class="card-header fs-5 fw-bold">
-                Output
-            </div>
+        <div id="output" class="card my-4">
+            <div class="card-header fs-5 fw-bold"></div>
             <div width="100%" align="center">   
                 <div id="boxplot" style="overflow-x: auto">
                     <div class="input-group_output" style="width: 85%;z-index:0;height: 42px;margin-top: 15px;margin-left: 5%;">
