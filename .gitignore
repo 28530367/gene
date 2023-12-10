@@ -11,3 +11,6 @@
 
 # Ignore all PDF files
 *.pdf
+
+# Ignore all __pycache__/
+__pycache__/
