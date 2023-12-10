@@ -67,7 +67,7 @@ $(document).ready(function () {
                         { data: 'name', title: 'Name' },
                         { data: 'p_value', title: 'P Value' },
                         { data: null, title: 'Site', render: function (data, type, row) {
-                            return '<a href="http://127.0.0.1:8000/DEIso/survival_analyis/?text=' + data['name'] + '"><button class="btn btn-primary btn-site">site</button></a>';
+                            return '<a href="http://127.0.0.1:8000/DEIso/survival_analyis/?text=' + data['name'] + '&type=' + dataTitle + '"><button class="btn btn-primary btn-site">site</button></a>';
                         }},
                     ],
                 });

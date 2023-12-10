@@ -43,6 +43,7 @@ class Survival_plot():
 		df = df[selected_columns]
 		df_result = df[df[f"{primary_key}"] == GT_input]
 		result = df_result.drop(columns= [f"{primary_key}"]).values.tolist()[0]
+
 		return result
 
 	def survival_plot(self, T1,E1,T2,E2,GT_input,primary_site,random_id,Low_Percentile,High_Percentile,survival_days,survival_select):
@@ -309,6 +310,7 @@ class Survival_screener():
 
 if __name__ == "__main__":
 
+	sp = Survival_plot()
 	ss = Survival_screener()
 	## cancer ➔ project table
 	# ex : python3 survival_analysis.py -p TCGA-ACC --primary_site Adrenal_Gland_Adrenocortical_Carcinoma -t genes -n KIF23 --Low_Percentile 50 --High_Percentile 50 --survival_days 4628 --survival_select all_stage
@@ -318,7 +320,7 @@ if __name__ == "__main__":
 	input_primary_site = "Adrenal_Gland_Adrenocortical_Carcinoma"
 	input_primary_site = input_primary_site.replace("_", " ")
 	input_type = "genes"
-	input_name = "AAGAB"
+	input_name = "A1BG"
 	Low_Percentile = 50
 	High_Percentile = 50
 	survival_days = 4628
@@ -339,6 +341,8 @@ if __name__ == "__main__":
 		'survival_select': survival_select,
 		'max_p_value': input_p_value
 	}
+	# result_sp = sp.survival_plot_realtime(plot_arg)
+
 	start_time = time.time()
 
 	result = ss.controller(plot_arg)

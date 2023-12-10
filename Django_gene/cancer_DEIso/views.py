@@ -14,7 +14,7 @@ def ajax_survival_analyis(request):
     input_project = "TCGA-ACC"
     input_primary_site = "Adrenal_Gland_Adrenocortical_Carcinoma"
     input_primary_site = input_primary_site.replace("_", " ")
-    input_type = "genes"
+    input_type = request.POST['input_type']
     input_name = request.POST['input_element']
     Low_Percentile = request.POST['input_low']
     High_Percentile = request.POST['input_high']

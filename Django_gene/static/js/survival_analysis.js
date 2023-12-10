@@ -31,6 +31,7 @@ function download_btn() {
 $(document).ready(function(){
     var urlParams = new URLSearchParams(window.location.search);
     var textParam = urlParams.get('text');
+    var type = urlParams.get('type');
 
     const loadingContainer = $('#loading-container');
     const loadingbackground = $('#loading-background');
@@ -56,6 +57,7 @@ $(document).ready(function(){
     });
 
     formData['input_element'] = textParam
+    formData['input_type'] = type
     
     $('#image').empty();
     $('#Download_csv').empty();
@@ -98,6 +100,7 @@ $(document).ready(function(){
         });
 
         formData['input_element'] = textParam
+        formData['input_type'] = type
 
         $('#image').empty();
         $('#Download_csv').empty();
