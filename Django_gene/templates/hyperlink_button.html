@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} hyperlink_button {% endblock %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="card mb-4" style="width: 95%;"> 
+        <div class="card-header fs-5 fw-bold">
+            Hyperlink Button
+        </div>
+        <div class='card-body'>
+            <div class="row">
+                <div class="col-md-2"><button class="button btn btn-warning">AT4G17500</button></div>
+                <div class="col-md-2"><button class="button btn btn-danger">AT5G56110</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/hyperlink_button.js' %}"></script>
+{% endblock %}

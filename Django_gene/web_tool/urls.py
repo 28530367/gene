@@ -16,5 +16,6 @@ urlpatterns = [
     path('pirna_binding_site/', views.pirna_binding_site),
     path('ajax_pirna_binding_site/', views.ajax_pirna_binding_site),
     path('ajax_pirna_binding_site_search/', views.ajax_pirna_binding_site_search),
-    path('dataTable/', views.dataTable)
+    path('dataTable/', views.dataTable),
+    path('hyperlink_button/', views.hyperlink_button)
 ]

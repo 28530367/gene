@@ -794,3 +794,9 @@ def ajax_pirna_binding_site_search(request):
 def dataTable(request):
 
     return render(request, 'dataTable.html', locals())
+
+'''===============================================================hyperlink_button================================================================'''
+
+def hyperlink_button(request):
+
+    return render(request, 'hyperlink_button.html', locals())
