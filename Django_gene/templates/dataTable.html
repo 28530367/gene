@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} DataTable {% endblock %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/dataTable.css' %}">
+{% endblock %}
+{% block content %}
+<div style="display: flex; justify-content: center;">
+    <div class="card mb-4" style="width: 95%;"> 
+        <div class="card-header fs-5 fw-bold">
+            DataTable
+        </div>
+        <div class='card-body'>
+           <table id="DataTable" class="table dt-body-center table-striped table-hover table-bordered" style="width: 100%; "></table>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/dataTable.js' %}"></script>
+{% endblock %}
+

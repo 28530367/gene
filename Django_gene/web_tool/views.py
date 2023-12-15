@@ -790,5 +790,7 @@ def ajax_pirna_binding_site_search(request):
         'pirna_svgdata_index': pirna_svgdata_index,
     })
     
+'''===============================================================datatable================================================================'''
+def dataTable(request):
 
-    
+    return render(request, 'dataTable.html', locals())

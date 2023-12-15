@@ -18,9 +18,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework import routers
+from table_api import views
+
+router1 = routers.DefaultRouter()
+router1.register(r'', views.UPDATEGEBEANNOTATIONViewSet, basename="update_GeneAnnotation")
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('web_tool/', include('web_tool.urls')),
     path('DEIso/', include('cancer_DEIso.urls')),
+    path(r'update_GeneAnnotation/', include(router1.urls)),
 ]
