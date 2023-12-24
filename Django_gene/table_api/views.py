@@ -51,14 +51,37 @@ class DatabaseManager(object):
         # 輸入框內容: eg:search content
         search_value = kwargs.get('search[value]', None)[0]
         # 排序方式 eg: asc/desc
-        # order_column = kwargs.get('order[0][column]', None)[0] 
-        # 由哪個column排序 eg:0, 1...
         order = kwargs.get('order[0][dir]', None)[0] 
+        # 由哪個column排序 eg:0, 1...
+        order_column = kwargs.get('order[0][column]', None)[0] 
+
+        dictionary = {"0": 'Gene ID',
+                      "1": 'Gene location',
+                      "2": 'Gene expression',
+                      "3": 'Accession number (Best hits in the GenBank)',
+                      "4": 'Annotation',
+                      "5": 'Species',
+                      "6": 'Blast Score',
+                      "7": 'Expect value',
+                      "8": 'Identities',
+                      "9": 'Frame',
+                      "10": 'KEGG pathway',
+                      "11": 'GO Term',
+                      "12": 'Interpro',
+                      "13": 'Pfam',
+                      "14": 'Swissprot',
+                      "15": 'TrEMBL',
+                      "16": 'TF_ath',
+                      "17": 'TF_osa'}
+        
+      
 
         # 資料庫拿取資料
         sql = """
-            SELECT * FROM `Lbarbarum_table` ORDER BY `Lbarbarum_table`.%s %s;;
-        """%('index', order)
+            SELECT * 
+            FROM `Lbarbarum_table`
+            ORDER BY `Lbarbarum_table`.`%s` %s;
+        """%(dictionary[order_column], order.upper())
         self.db_cursor.execute(sql)
         data = self.db_cursor.fetchall()
         

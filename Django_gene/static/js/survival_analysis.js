@@ -58,6 +58,7 @@ $(document).ready(function(){
 
     formData['input_element'] = textParam
     formData['input_type'] = type
+    formData['check'] = 0;
     
     $('#image').empty();
     $('#Download_csv').empty();
@@ -65,6 +66,8 @@ $(document).ready(function(){
         url: '/DEIso/ajax_survival_analyis/', 
         data: formData,
         success: function(response){
+            var maxmium_day = response.maxmium_day;
+            $("#survival_days_Adrenal").val(maxmium_day);
             loadingContainer.hide();
             loadingbackground.hide();
             secondsCounter.hide();
@@ -101,6 +104,7 @@ $(document).ready(function(){
 
         formData['input_element'] = textParam
         formData['input_type'] = type
+        formData['check'] = 1;
 
         $('#image').empty();
         $('#Download_csv').empty();

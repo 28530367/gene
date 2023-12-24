@@ -4,10 +4,11 @@ $(document).ready(function(){
             processing: true,
             serverSide: true,
             language: {
-                searchPlaceholder: "Please Press Enter."
+                searchPlaceholder: "Please Press Enter.",
+                processing: "<div class='alert alert-success'>Processing........</div>",
             },
             searching: false,
-
+            "searchDelay": 9999999999999,
             ajax: {
                 "url": "/update_GeneAnnotation/",
                 "type": "GET"
@@ -36,5 +37,16 @@ $(document).ready(function(){
             "deferRender": true,
             'dom': '<"top"frB>t<"bottom"lrip>',
         });
+
+    // 获取搜索输入框
+    var searchInput = $('#DataTable_filter input');
+
+    // 监听输入框的键盘事件
+    searchInput.off().on('keyup', function(e) {
+        if (e.keyCode === 13) {
+            table.search(this.value).draw();
+        }   
+    });
+
 })
 

@@ -10,5 +10,5 @@
 # Ignore all /__pycache__/
 /__pycache__/
 
-# Ignore all .log
+# Ignore all log
 *.log

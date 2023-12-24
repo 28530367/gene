@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} DE Genes Screener {% endblock %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/DE_gene_screener.css' %}">
+{% endblock %}
+{% block content %}
+<div id="container">
+    <div class="card-body text-dark">
+        <div class="card my-4">
+            <div class="card-header fs-5 fw-bold">
+                Search
+            </div>
+            <div width="100%" align="center">
+                <form class="form-horizontal SearchForm" style="border-top-left-radius:0;">
+                    <br>
+                    <div class="FormOption">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Select type : </label>
+                            <div class="searchable-container">
+                                <div id="radioBtn" class="row">
+                                    <div class="col-sm-3"></div>
+                                    <div class="col-sm-3">
+                                        <a class="btn btn-primary btn-lg active btn-toggle" data-toggle="DE_level" data-title="genes">DE Genes</a>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <a class="btn btn-primary btn-lg notActive btn-toggle" data-toggle="DE_level" data-title="isoforms">DE Isoforms</a>
+                                    </div>
+                                    <div class="col-sm-3"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="FormOption">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Select a cancer : </label>
+                            <div class="col-sm-6">
+                                <div id="primary_site_div">
+                                    <select class="form-control select2-hidden-accessible" id="primary_select" style="width: 100%" name="select_element" tabindex="-1" aria-hidden="true">
+                                        <option value="liver_cancer">Liver cancer</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                    <br>
+                    <div class="FormOption">
+                        <div class="form-group">
+                            <div class="searchable-container">
+                                <div id="radioBtn" class="row">
+                                    <div class="col-sm-4"></div>
+                                    <div class="col-sm-2">
+                                        <label for="condition2">Condition 2</label>
+                                        <select id="condition2" name="condition2" style="height: 30px; width: 200px;">
+                                            <option value="N">Narmal (n=50)</option>
+                                            <option value="1">Stage I (n=171)</option>
+                                            <option value="2">Stage II (n=86)</option>
+                                            <option value="3">Stage III (n=85)</option>
+                                            <option value="4">Stage IV (n=5)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label for="condition1">Condition 1</label>
+                                        <select id="condition1" name="condition1" style="height: 30px; width: 200px;">
+                                            <option value="1">Stage I (n=171)</option>
+                                            <option value="2">Stage II (n=86)</option>
+                                            <option value="3">Stage III (n=85)</option>
+                                            <option value="4">Stage IV (n=5)</option>
+                                            <option value="N">Narmal (n=50)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                    <br>
+                    <div class="FormOption">
+                        <div class="form-group">
+                            <div class="searchable-container">
+                                <div id="radioBtn" class="row">
+                                    <div class="col-sm-4"></div>
+                                    <div class="col-sm-4">
+                                        <label>Fold Change of Average FPKM :</label>
+                                        <div style="display: flex; align-items: center;">
+                                            <div>Condition2/condition1</div>
+                                            &nbsp;
+                                            &nbsp;
+                                            <select id="conditions_compare" name="conditions_compare" style="height: 30px;">
+                                                <option value="ge"> &ge;</option>
+                                                <option value="le"> &le;</option>
+                                            </select>
+                                            &nbsp;
+                                            <input type="number" id="fold_change" name="fold_change" value="2">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                    <br>
+                    <div class="FormOption">
+                        <div class="form-group">
+                            <div class="searchable-container">
+                                <div id="radioBtn">
+                                    <div class="row">
+                                        <div class="col-sm-4"></div>
+                                        <div class="col-sm-4">
+                                            <label>Statistical Significance</label>
+                                        </div>
+                                        <div class="col-sm-4"></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <label for="test">Test </label>
+                                            <select id="test" name="test" style="height: 30px;">
+                                                <option value="U_test">U Test</option>
+                                                <option value="KS_test">KS Test</option>
+                                                <option value="T_test">T Test</option>
+                                                <option value="DE_test">Cuffdiff DE Test</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="direction">Direction </label>
+                                            <select id="direction" name="direction" style="height: 30px;">
+                                                <option value="greater">Greater (Condition2 &ge; Condition1)</option>
+                                                <option value="less">Less (Condition2 &le; Condition1)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="fold_change">q-value cutoff </label>
+                                            <input type="number" id="qvalue" name="qvalue" value="0.05">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <button type="button" value="search" id="send" class="btn btn-primary submit">Search</button>
+                    </div>
+                    <br>
+                </form>
+            </div>
+        </div>
+        <div id="result" style="visibility: hidden;">
+            <div class="row" >
+                <div class="col-md-6">
+                    <div class="card mt-3">
+                        <div class="card-header fs-5">
+                            User's Input
+                        </div>
+                        <div id="userInput" class="card-body">
+        
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mt-3">
+                        <div class="card-header fs-5">
+                            Define differential expression
+                        </div>
+                        <div id="defineExpression" class="card-body">
+        
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mt-3">
+                <div class="card-header fs-5 fw-bold">
+                    Result
+                </div>
+                <div id="table" style="width: 100%;">
+                </div>
+            </div>
+        </div>
+	</div>
+</div>
+
+
+<script src="{% static 'js/DE_gene_screener.js' %}"></script>
+{% endblock %}
+                                    
